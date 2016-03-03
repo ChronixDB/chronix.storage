@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/ChronixDB/chronix.storage.svg)](https://travis-ci.org/ChronixDB/chronix.server)
-[![Coverage Status](https://coveralls.io/repos/ChronixDB/chronix.storage/badge.svg?branch=master&service=github)](https://coveralls.io/github/ChronixDB/chronix.server?branch=master)
-[![Stories in Ready](https://badge.waffle.io/ChronixDB/chronix.storage.png?label=ready&title=Ready)](https://waffle.io/ChronixDB/chronix.server)
-[![Apache License 2](http://img.shields.io/badge/license-ASF2-blue.svg)](https://github.com/ChronixDB/chronix.server/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/ChronixDB/chronix.storage.svg)](https://travis-ci.org/ChronixDB/chronix.storage)
+[![Coverage Status](https://coveralls.io/repos/github/ChronixDB/chronix.storage/badge.svg?branch=master)](https://coveralls.io/github/ChronixDB/chronix.storage?branch=master)
+[![Stories in Ready](https://badge.waffle.io/ChronixDB/chronix.storage.png?label=ready&title=Ready)](https://waffle.io/ChronixDB/chronix.storage)
+[![Apache License 2](http://img.shields.io/badge/license-ASF2-blue.svg)](https://github.com/ChronixDB/chronix.storage/blob/master/LICENSE)
 
 
 # Chronix Storage
@@ -13,7 +13,7 @@ Is there anything missing? Do you have ideas for new features or improvements? Y
 your improvements, to the Chronix projects. All you have to do is to fork this repository,
 improve the code and issue a pull request.
 
-## Building Chronix from Scratch
+## Building Chronix Storage from Scratch
 Everything should run out of the box. The only three things that must be available:
 - Git
 - JDK 1.8
