@@ -2,7 +2,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/ChronixDB/chronix.storage/badge.svg?branch=master)](https://coveralls.io/github/ChronixDB/chronix.storage?branch=master)
 [![Stories in Ready](https://badge.waffle.io/ChronixDB/chronix.storage.png?label=ready&title=Ready)](https://waffle.io/ChronixDB/chronix.storage)
 [![Apache License 2](http://img.shields.io/badge/license-ASF2-blue.svg)](https://github.com/ChronixDB/chronix.storage/blob/master/LICENSE)
-
+[ ![Download](https://api.bintray.com/packages/chronix/maven/chronix-storage/images/download.svg) ](https://bintray.com/chronix/maven/chronix-storage/_latestVersion)
 
 # Chronix Storage
 The Chronix Storage is an implementation of the Chronix API that uses Apache Lucene.
