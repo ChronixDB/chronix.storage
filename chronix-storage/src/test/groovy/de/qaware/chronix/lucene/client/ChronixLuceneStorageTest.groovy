@@ -65,7 +65,6 @@ class ChronixLuceneStorageTest extends Specification {
         when:
         def documents = createDocument(1)
         luceneStorage.add(new SimpleTimeSeriesConverter(), documents, luceneIndex)
-        luceneIndex.getOpenWriter().commit()
 
         def stream = luceneStorage.stream(new SimpleTimeSeriesConverter(), luceneIndex, query)
 
