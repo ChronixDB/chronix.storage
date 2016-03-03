@@ -1,3 +1,5 @@
 rootProject.name = 'chronix.storage'
 
 include 'chronix-storage'
+include 'chronix-storage-integration'
+

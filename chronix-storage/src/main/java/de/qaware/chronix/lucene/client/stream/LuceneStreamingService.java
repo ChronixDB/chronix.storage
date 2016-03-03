@@ -19,7 +19,9 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import de.qaware.chronix.Schema;
 import de.qaware.chronix.converter.TimeSeriesConverter;
+import de.qaware.chronix.lucene.client.stream.date.DateQueryParser;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -28,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.concurrent.Executors;
 
@@ -91,6 +94,28 @@ public class LuceneStreamingService<T> implements Iterator<T> {
         this.searcher = searcher;
         this.nrOfTimeSeriesPerBatch = nrOfTimeSeriesPerBatch;
         this.timeSeriesHandler = new TimeSeriesHandler<>(200);
+        parseDates(query);
+    }
+
+    private void parseDates(Query query) {
+        DateQueryParser dateRangeParser = new DateQueryParser(new String[]{Schema.START, Schema.END});
+        long[] startAndEnd = new long[0];
+        try {
+            startAndEnd = dateRangeParser.getNumericQueryTerms(query.toString());
+
+        } catch (ParseException e) {
+            LOGGER.warn("Could not parse start or end", e);
+        }
+        this.queryStart = or(startAndEnd[0], -1, 0);
+        this.queryEnd = or(startAndEnd[1], -1, Long.MAX_VALUE);
+    }
+
+    private long or(long value, long condition, long or) {
+        if (value == condition) {
+            return or;
+        } else {
+            return value;
+        }
     }
 
     @Override
@@ -108,9 +133,9 @@ public class LuceneStreamingService<T> implements Iterator<T> {
 
     @Override
     public T next() {
-        if (currentDocumentCount % 200 == 0) {
+        if (currentDocumentCount % nrOfTimeSeriesPerBatch == 0) {
             try {
-                ScoreDoc[] hits = searcher.search(query, 200).scoreDocs;
+                ScoreDoc[] hits = searcher.search(query, nrOfTimeSeriesPerBatch).scoreDocs;
                 convertHits(hits);
             } catch (IOException e) {
                 LOGGER.info("Could not search documents");

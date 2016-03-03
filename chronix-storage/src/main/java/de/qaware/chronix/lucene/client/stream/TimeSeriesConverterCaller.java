@@ -16,14 +16,18 @@
 package de.qaware.chronix.lucene.client.stream;
 
 
-import de.qaware.chronix.Schema;
 import de.qaware.chronix.converter.BinaryTimeSeries;
 import de.qaware.chronix.converter.TimeSeriesConverter;
+import de.qaware.chronix.lucene.client.ValueConverterHelper;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -65,7 +69,25 @@ public class TimeSeriesConverterCaller<T> implements Callable<T> {
     public T call() throws Exception {
         BinaryTimeSeries.Builder timeSeriesBuilder = new BinaryTimeSeries.Builder();
 
-        document.forEach(attributeField -> addToBuilder(timeSeriesBuilder, attributeField));
+        Map<String, List<Object>> multivalued = new HashMap<>();
+
+        document.forEach(attributeField -> {
+            String key = attributeField.name();
+
+            if (key.contains(ValueConverterHelper.MULTI_VALUE_FIELD_DELIMITER)) {
+                key = key.substring(0, key.indexOf(ValueConverterHelper.MULTI_VALUE_FIELD_DELIMITER));
+                //Handle multivalued fields
+                if (!multivalued.containsKey(key)) {
+                    multivalued.put(key, new ArrayList<>());
+                }
+                multivalued.get(key).add(convert(attributeField));
+
+            } else {
+                timeSeriesBuilder.field(key, convert(attributeField));
+            }
+        });
+        multivalued.forEach(timeSeriesBuilder::field);
+
         LOGGER.debug("Calling document converter with {}", document);
         T timeSeries = documentConverter.from(timeSeriesBuilder.build(), queryStart, queryEnd);
         LOGGER.debug("Returning time series {} to callee", timeSeries);
@@ -77,35 +99,21 @@ public class TimeSeriesConverterCaller<T> implements Callable<T> {
      * Checks if the attribute is of type byte[], String, Number or Collection.
      * Otherwise the attribute is ignored.
      *
-     * @param timeSeriesBuilder the binary time series builder
-     * @param field             the attribute field
+     * @param field the attribute field
      */
-    private void addToBuilder(BinaryTimeSeries.Builder timeSeriesBuilder, IndexableField field) {
+    private Object convert(IndexableField field) {
+        LOGGER.debug("Reading field {} ", field);
+
         if (field.numericValue() != null) {
-
-            if (field.name().equals(Schema.START)) {
-                timeSeriesBuilder.start(field.numericValue().longValue());
-            } else if (field.name().equals(Schema.END)) {
-                timeSeriesBuilder.end(field.numericValue().longValue());
-            } else {
-                timeSeriesBuilder.field(field.name(), field.numericValue());
-            }
-
+            return field.numericValue();
         } else if (field.stringValue() != null) {
-            if (field.name().equals(Schema.ID)) {
-                timeSeriesBuilder.id(field.stringValue());
-            } else {
-                timeSeriesBuilder.field(field.name(), field.stringValue());
-            }
-
+            return field.stringValue();
         } else if (field.binaryValue() != null) {
-            if (field.name().equals(Schema.DATA)) {
-                timeSeriesBuilder.data(field.binaryValue().bytes);
-            } else {
-                timeSeriesBuilder.field(field.name(), field.binaryValue().bytes);
-            }
+            return field.binaryValue().bytes;
+        } else {
+            LOGGER.debug("Field {} could not be handled. Type is not supported", field);
+            return null;
         }
     }
-
-
 }
+

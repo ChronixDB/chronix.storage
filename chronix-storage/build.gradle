@@ -99,7 +99,7 @@ bintray {
         name = project.name
         desc = project.description
         licenses = ['Apache-2.0']
-        labels = ['java', 'time series', 'chronix', 'server']
+        labels = ['java', 'time series', 'chronix', 'storage']
         websiteUrl = project.websiteUrl
         issueTrackerUrl = project.issueTrackerUrl
         vcsUrl = project.scmUrl

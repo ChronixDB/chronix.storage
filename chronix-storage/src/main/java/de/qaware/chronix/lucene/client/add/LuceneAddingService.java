@@ -17,10 +17,8 @@ package de.qaware.chronix.lucene.client.add;
 
 import de.qaware.chronix.converter.BinaryTimeSeries;
 import de.qaware.chronix.converter.TimeSeriesConverter;
+import de.qaware.chronix.lucene.client.ValueConverterHelper;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DoubleField;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +55,8 @@ public final class LuceneAddingService {
 
         timeSeries.parallelStream().forEach(ts -> {
             try {
-                indexWriter.addDocument(convert(ts, converter));
+                Document luceneDoc = convert(ts, converter);
+                indexWriter.addDocument(luceneDoc);
             } catch (IOException e) {
                 LOGGER.error("Could not add documents to lucene.", e);
             }
@@ -77,16 +76,17 @@ public final class LuceneAddingService {
 
         series.getFields().entrySet().forEach(entry -> {
 
-            Object value = entry.getValue();
-
-            //TODO: That's ugly. See how solr has dealt with that.
-            if (value instanceof Number) {
-                document.add(new DoubleField(entry.getKey(), Double.parseDouble(entry.getValue().toString()), TextField.TYPE_STORED));
-            } else if (value instanceof String) {
-                document.add(new Field(entry.getKey(), entry.getValue().toString(), TextField.TYPE_STORED));
+            if (entry.getValue() instanceof Number) {
+                ValueConverterHelper.handleNumbers(document, entry.getKey(), entry.getValue());
+            } else if (entry.getValue() instanceof String || entry.getValue() instanceof byte[]) {
+                ValueConverterHelper.handleStringsAndBytes(document, entry.getKey(), entry.getValue());
+            } else if (entry.getValue() instanceof Collection || entry.getValue() instanceof Object[]) {
+                ValueConverterHelper.handleCollectionsAndArrays(document, entry);
+            } else {
+                LOGGER.debug("Field {} could not be handled. Type is not supported", entry);
             }
         });
-
         return document;
     }
+
 }
