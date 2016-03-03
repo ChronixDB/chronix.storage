@@ -18,7 +18,7 @@ package de.qaware.chronix.lucene.client.stream;
 
 import de.qaware.chronix.converter.BinaryTimeSeries;
 import de.qaware.chronix.converter.TimeSeriesConverter;
-import de.qaware.chronix.lucene.client.ValueConverterHelper;
+import de.qaware.chronix.lucene.client.ChronixLuceneStorageConstants;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.slf4j.Logger;
@@ -74,8 +74,8 @@ public class TimeSeriesConverterCaller<T> implements Callable<T> {
         document.forEach(attributeField -> {
             String key = attributeField.name();
 
-            if (key.contains(ValueConverterHelper.MULTI_VALUE_FIELD_DELIMITER)) {
-                key = key.substring(0, key.indexOf(ValueConverterHelper.MULTI_VALUE_FIELD_DELIMITER));
+            if (key.contains(ChronixLuceneStorageConstants.MULTI_VALUE_FIELD_DELIMITER)) {
+                key = key.substring(0, key.indexOf(ChronixLuceneStorageConstants.MULTI_VALUE_FIELD_DELIMITER));
                 //Handle multivalued fields
                 if (!multivalued.containsKey(key)) {
                     multivalued.put(key, new ArrayList<>());

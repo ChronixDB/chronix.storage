@@ -35,11 +35,11 @@ import java.util.stream.StreamSupport;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
- * Apache Solr storage implementation of the Chronix StorageService interface
+ * Lucene storage implementation of the Chronix StorageService interface
  *
  * @param <T> - the time series type
  */
-public class ChronixLuceneStorage<T> implements StorageService<T, LuceneIndex, Query> {
+public final class ChronixLuceneStorage<T> implements StorageService<T, LuceneIndex, Query> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChronixLuceneStorage.class);
 
     private final int nrOfDocumentPerBatch;
@@ -86,7 +86,7 @@ public class ChronixLuceneStorage<T> implements StorageService<T, LuceneIndex, Q
 
     /**
      * Adds the given collection of documents to the solr connection using the collector.
-     * Note: The function does not call commit on the connection. Documents are just added to apache solr.
+     * Note: The function does not call commit on the connection. Documents are just added to lucene.
      *
      * @param converter   the converter matching the type <T>
      * @param documents   the documents of type <T>

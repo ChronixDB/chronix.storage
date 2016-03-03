@@ -19,21 +19,22 @@ import de.qaware.chronix.converter.BinaryTimeSeries;
 import de.qaware.chronix.converter.TimeSeriesConverter;
 
 /**
- * A converter used for test purposes
+ * A converter used for test purposes.
+ * Converts a SimpleTimeSeries to a BinaryTimeSeries an back.
  *
  * @author f.lautenschlager
  */
-public class TestConverter implements TimeSeriesConverter<MySimpleTimeSeries> {
+public class SimpleTimeSeriesConverter implements TimeSeriesConverter<SimpleTimeSeries> {
     @Override
-    public MySimpleTimeSeries from(BinaryTimeSeries binaryTimeSeries, long queryStart, long queryEnd) {
-        MySimpleTimeSeries doc = new MySimpleTimeSeries();
+    public SimpleTimeSeries from(BinaryTimeSeries binaryTimeSeries, long queryStart, long queryEnd) {
+        SimpleTimeSeries doc = new SimpleTimeSeries();
         binaryTimeSeries.getFields().forEach(doc::add);
 
         return doc;
     }
 
     @Override
-    public BinaryTimeSeries to(MySimpleTimeSeries document) {
+    public BinaryTimeSeries to(SimpleTimeSeries document) {
         BinaryTimeSeries.Builder binaryTimeSeries = new BinaryTimeSeries.Builder();
         document.getFields().forEach(binaryTimeSeries::field);
         return binaryTimeSeries.build();

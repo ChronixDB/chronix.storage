@@ -64,22 +64,22 @@ class ChronixLuceneStorageTest extends Specification {
 
         when:
         def documents = createDocument(1)
-        luceneStorage.add(new TestConverter(), documents, luceneIndex)
-        luceneIndex.getWriter().commit()
+        luceneStorage.add(new SimpleTimeSeriesConverter(), documents, luceneIndex)
+        luceneIndex.getOpenWriter().commit()
 
-        def stream = luceneStorage.stream(new TestConverter(), luceneIndex, query)
+        def stream = luceneStorage.stream(new SimpleTimeSeriesConverter(), luceneIndex, query)
 
-        luceneIndex.getReader().close()
+        luceneIndex.getOpenReader().close()
         luceneIndex.getDirectory().close()
 
         then:
         stream.count() == 1
     }
 
-    Collection<MySimpleTimeSeries> createDocument(int i) {
+    Collection<SimpleTimeSeries> createDocument(int i) {
         def text = "This is the text to be indexed.";
 
-        def document = new MySimpleTimeSeries()
+        def document = new SimpleTimeSeries()
         document.add("fieldname", text);
 
         [document]

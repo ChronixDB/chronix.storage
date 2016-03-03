@@ -15,38 +15,40 @@
  */
 package de.qaware.chronix.lucene.client;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * An simple time series (without points ;-) used for test purposes
  *
+ * @author f.lautenschlager
  */
-public class MySimpleTimeSeries {
+public class SimpleTimeSeries {
 
     private Map<String, Object> fields;
 
-    public MySimpleTimeSeries() {
+    /**
+     * Constructs a simple time series
+     */
+    public SimpleTimeSeries() {
         fields = new HashMap<>();
     }
 
+    /**
+     * Adds a field for the given name and value.
+     * Overrides old values.
+     *
+     * @param name  the field name
+     * @param value the field value
+     */
     public void add(String name, Object value) {
         fields.put(name, value);
     }
 
-    public Object get(String name) {
-        return fields.get(name);
-    }
-
+    /**
+     * @return the fields of the time series
+     */
     public Map<String, Object> getFields() {
         return fields;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("fields", fields)
-                .toString();
     }
 }

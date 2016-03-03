@@ -38,7 +38,6 @@ public final class LuceneIndex {
 
     private IndexSearcher searcher;
     private IndexReader reader;
-    boolean reopenReader = true;
     private IndexWriter writer;
 
     private final Directory directory;
@@ -46,6 +45,9 @@ public final class LuceneIndex {
 
     /**
      * Constructs and lucene index
+     *
+     * @param directory the directory of the index (RAM, File System, ...)
+     * @param analyzer  the analyzer for the reader and writer
      */
     public LuceneIndex(Directory directory, Analyzer analyzer) {
         this.directory = directory;
@@ -59,7 +61,7 @@ public final class LuceneIndex {
      * @return the lucene index searcher
      */
     public IndexSearcher getSearcher() throws IOException {
-        if (searcher == null || reopenReader) {
+        if (searcher == null && readerClosed()) {
             reader = getOpenReader();
             searcher = new IndexSearcher(reader);
         }
@@ -67,69 +69,77 @@ public final class LuceneIndex {
 
     }
 
-    /**
-     * The returned index writer can be initialized.
-     *
-     * @return the index writer.
-     */
-    public IndexWriter getWriter() {
-        return writer;
-    }
 
     /**
-     * @return the lucene index writer
+     * This method returns an open writer for the given directory.
+     * If the reader is open this method will close the reader.
+     *
+     * @return an open lucene writer
      */
     public IndexWriter getOpenWriter() throws IOException {
-        if (writer == null || !writer.isOpen()) {
+        if (writerClosed()) {
             LOGGER.debug("Closing reader and opening writer.");
-            if (reader != null) {
+            if (readerOpen()) {
                 LOGGER.debug("Closing reader.");
                 reader.close();
-                reopenReader = true;
             }
-            writer = openWriter();
+            IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            writer = new IndexWriter(directory, config);
         }
         return writer;
     }
 
     /**
-     * The returned index reader can be initialized.
+     * Closes the index writer if it is open.
+     * Then opens the index reader.
      *
-     * @return the index reader.
-     */
-    public IndexReader getReader() {
-        return reader;
-    }
-
-    /**
-     * @return the lucene index reader
+     * @return an open lucene reader.
      */
     public IndexReader getOpenReader() throws IOException {
-        if (writer != null && writer.isOpen()) {
+        if (writerOpen()) {
             LOGGER.debug("Closing writer");
             writer.close();
         }
-        if (reader == null || reopenReader) {
+        if (readerClosed()) {
             LOGGER.debug("Opening reader");
-            reader = openReader();
-            reopenReader = false;
+            reader = DirectoryReader.open(directory);
         }
         return reader;
     }
 
-    private IndexReader openReader() throws IOException {
-        return DirectoryReader.open(directory);
-    }
-
-    private IndexWriter openWriter() throws IOException {
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        return new IndexWriter(directory, config);
-    }
 
     /**
      * @return the directory holding the index
      */
     public Directory getDirectory() {
         return directory;
+    }
+
+    /**
+     * @return true if the reader is open
+     */
+    private boolean readerOpen() {
+        return !readerClosed();
+    }
+
+    /**
+     * @return true if the reader is null or closed
+     */
+    private boolean readerClosed() {
+        return reader == null || reader.getRefCount() == 0;
+    }
+
+    /**
+     * @return true if the writer is null or closed
+     */
+    private boolean writerClosed() {
+        return writer == null || !writer.isOpen();
+    }
+
+    /**
+     * @return true if the writer is open
+     */
+    private boolean writerOpen() {
+        return !writerClosed();
     }
 }

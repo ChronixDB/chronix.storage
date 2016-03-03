@@ -246,28 +246,6 @@ public class DateMathParser {
         }
     }
 
-    /**
-     * @return the time zone
-     */
-    public TimeZone getTimeZone() {
-        return this.zone;
-    }
-
-    /**
-     * @return the locale
-     */
-    public Locale getLocale() {
-        return this.loc;
-    }
-
-    /**
-     * Defines this instance's concept of "now".
-     *
-     * @see #getNow
-     */
-    public void setNow(Date n) {
-        now = n;
-    }
 
     /**
      * @return the current date
