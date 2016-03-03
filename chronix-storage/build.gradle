@@ -6,12 +6,11 @@ sonarqube {
 
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.1'
-    compile 'commons-codec:commons-codec:1.10'
     compile 'de.qaware.chronix:chronix-api:0.1'
-
     compile 'org.apache.lucene:lucene-core:5.5.0'
-    compile 'org.apache.lucene:lucene-analyzers-common:5.5.0'
-    compile 'org.apache.lucene:lucene-queryparser:5.5.0'
+
+    testCompile 'org.apache.lucene:lucene-analyzers-common:5.5.0'
+    testCompile 'org.apache.lucene:lucene-queryparser:5.5.0'
 }
 
 task copyTestResources(type: Copy) {

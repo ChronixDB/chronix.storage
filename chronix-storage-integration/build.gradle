@@ -4,9 +4,9 @@ dependencies {
     testCompile 'de.qaware.chronix:chronix-kassiopeia-simple-converter:0.1.4'
     testCompile 'de.qaware.chronix:chronix-kassiopeia-converter-common:0.1.4'
 
-    compile 'org.apache.lucene:lucene-core:5.5.0'
-    compile 'org.apache.lucene:lucene-analyzers-common:5.5.0'
-    compile 'org.apache.lucene:lucene-queryparser:5.5.0'
+    testCompile 'org.apache.lucene:lucene-core:5.5.0'
+    testCompile 'org.apache.lucene:lucene-analyzers-common:5.5.0'
+    testCompile 'org.apache.lucene:lucene-queryparser:5.5.0'
 
-    compile project(':chronix-storage')
+    testCompile project(':chronix-storage')
 }
