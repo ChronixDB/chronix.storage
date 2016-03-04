@@ -108,13 +108,16 @@ public final class LuceneAddingService {
      */
     private static void handleArraysAndIterable(Document document, String fieldName, Object fieldValue) {
 
+        //assign the value as it is modified below
+        Object modifiedFieldValue = fieldValue;
+
         //If have an array, simple convert it into an list.
-        if (fieldValue != null && fieldValue.getClass().isArray()) {
-            fieldValue = Arrays.asList((Object[]) fieldValue);
+        if (modifiedFieldValue != null && modifiedFieldValue.getClass().isArray()) {
+            modifiedFieldValue = Arrays.asList((Object[]) fieldValue);
         }
         //Handle all iterable data types
-        if (fieldValue instanceof Iterable) {
-            Collection objects = (Collection) fieldValue;
+        if (modifiedFieldValue instanceof Iterable) {
+            Iterable objects = (Iterable) modifiedFieldValue;
 
             int fieldCounter = 0;
             fieldName = fieldName + ChronixLuceneStorageConstants.MULTI_VALUE_FIELD_DELIMITER;
