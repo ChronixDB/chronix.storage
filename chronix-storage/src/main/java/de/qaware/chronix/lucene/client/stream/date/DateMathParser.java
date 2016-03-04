@@ -80,18 +80,18 @@ import java.util.regex.Pattern;
  * request param.
  * </p>
  */
-public class DateMathParser {
+public final class DateMathParser {
 
-    public static TimeZone UTC = TimeZone.getTimeZone("UTC");
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     /**
      * Default TimeZone for DateMath rounding (UTC)
      */
-    public static final TimeZone DEFAULT_MATH_TZ = UTC;
+    private static final TimeZone DEFAULT_MATH_TZ = UTC;
     /**
      * Default Locale for DateMath rounding (Locale.ROOT)
      */
-    public static final Locale DEFAULT_MATH_LOCALE = Locale.ROOT;
+    private static final Locale DEFAULT_MATH_LOCALE = Locale.ROOT;
 
     /**
      * A mapping from (uppercased) String labels idenyifying time units,
@@ -106,7 +106,47 @@ public class DateMathParser {
      *
      * @see Calendar
      */
-    public static final Map<String, Integer> CALENDAR_UNITS = makeUnitsMap();
+    private static final Map<String, Integer> CALENDAR_UNITS = makeUnitsMap();
+
+    private static Pattern splitter = Pattern.compile("\\b|(?<=\\d)(?=\\D)");
+
+    private TimeZone zone;
+    private Locale loc;
+    private Date now;
+
+    /**
+     * Default constructor that assumes UTC should be used for rounding unless
+     * otherwise specified in the SolrRequestInfo
+     *
+     * @see #DEFAULT_MATH_LOCALE
+     */
+    public DateMathParser() {
+        this(null, DEFAULT_MATH_LOCALE);
+
+    }
+
+    /**
+     * @param tz The TimeZone used for rounding (to determine when hours/days begin).  If null, then this method defaults to the value dicated by the SolrRequestInfo if it
+     *           exists -- otherwise it uses UTC.
+     * @param l  The Locale used for rounding (to determine when weeks begin).  If null, then this method defaults to en_US.
+     * @see #DEFAULT_MATH_TZ
+     * @see #DEFAULT_MATH_LOCALE
+     * @see Calendar#getInstance(TimeZone, Locale)
+     */
+    public DateMathParser(TimeZone tz, Locale l) {
+        if (null == l) {
+            loc = DEFAULT_MATH_LOCALE;
+        } else {
+            loc = l;
+        }
+
+        if (null == tz) {
+            zone = DEFAULT_MATH_TZ;
+        } else {
+            zone = tz;
+        }
+    }
+
 
     /**
      * @see #CALENDAR_UNITS
@@ -150,13 +190,12 @@ public class DateMathParser {
      * @throws IllegalArgumentException if unit isn't recognized.
      * @see #CALENDAR_UNITS
      */
-    public static void add(Calendar c, int val, String unit) {
+    private static void add(Calendar c, int val, String unit) {
         Integer uu = CALENDAR_UNITS.get(unit);
         if (null == uu) {
-            throw new IllegalArgumentException("Adding Unit not recognized: "
-                    + unit);
+            throw new IllegalArgumentException("Adding Unit not recognized: " + unit);
         }
-        c.add(uu, val);
+        c.add(uu.intValue(), val);
     }
 
     /**
@@ -165,11 +204,10 @@ public class DateMathParser {
      * @throws IllegalArgumentException if unit isn't recognized.
      * @see #CALENDAR_UNITS
      */
-    public static void round(Calendar c, String unit) {
+    private static void round(Calendar c, String unit) {
         Integer uu = CALENDAR_UNITS.get(unit);
         if (null == uu) {
-            throw new IllegalArgumentException("Rounding Unit not recognized: "
-                    + unit);
+            throw new IllegalArgumentException("Rounding Unit not recognized: " + unit);
         }
         int u = uu;
 
@@ -201,51 +239,10 @@ public class DateMathParser {
                 c.clear(Calendar.MILLISECOND);
                 break;
             default:
-                throw new IllegalStateException(
-                        "No logic for rounding value (" + u + ") " + unit
-                );
+                throw new IllegalStateException("No logic for rounding value (" + u + ") " + unit);
         }
 
     }
-
-
-    private TimeZone zone;
-    private Locale loc;
-    private Date now;
-
-    /**
-     * Default constructor that assumes UTC should be used for rounding unless
-     * otherwise specified in the SolrRequestInfo
-     *
-     * @see #DEFAULT_MATH_LOCALE
-     */
-    public DateMathParser() {
-        this(null, DEFAULT_MATH_LOCALE);
-
-    }
-
-    /**
-     * @param tz The TimeZone used for rounding (to determine when hours/days begin).  If null, then this method defaults to the value dicated by the SolrRequestInfo if it
-     *           exists -- otherwise it uses UTC.
-     * @param l  The Locale used for rounding (to determine when weeks begin).  If null, then this method defaults to en_US.
-     * @see #DEFAULT_MATH_TZ
-     * @see #DEFAULT_MATH_LOCALE
-     * @see Calendar#getInstance(TimeZone, Locale)
-     */
-    public DateMathParser(TimeZone tz, Locale l) {
-        if (null == l) {
-            loc = DEFAULT_MATH_LOCALE;
-        } else {
-            loc = l;
-        }
-
-        if (null == tz) {
-            zone = DEFAULT_MATH_TZ;
-        } else {
-            zone = tz;
-        }
-    }
-
 
     /**
      * @return the current date
@@ -278,36 +275,31 @@ public class DateMathParser {
         while (pos < ops.length) {
 
             if (1 != ops[pos].length()) {
-                throw new ParseException
-                        ("Multi character command found: \"" + ops[pos] + "\"", pos);
+                throw new ParseException("Multi character command found: \"" + ops[pos] + "\"", pos);
             }
             char command = ops[pos++].charAt(0);
 
             switch (command) {
                 case '/':
                     if (ops.length < pos + 1) {
-                        throw new ParseException
-                                ("Need a unit after command: \"" + command + "\"", pos);
+                        throw new ParseException("Need a unit after command: \"" + command + "\"", pos);
                     }
                     try {
                         round(cal, ops[pos++]);
                     } catch (IllegalArgumentException e) {
-                        throw new ParseException
-                                ("Unit not recognized: \"" + ops[pos - 1] + "\"", pos - 1);
+                        throw new ParseException("Unit not recognized: \"" + ops[pos - 1] + "\"", pos - 1);
                     }
                     break;
                 case '+': /* fall through */
                 case '-':
                     if (ops.length < pos + 2) {
-                        throw new ParseException
-                                ("Need a value and unit for command: \"" + command + "\"", pos);
+                        throw new ParseException("Need a value and unit for command: \"" + command + "\"", pos);
                     }
-                    int val = 0;
+                    int val;
                     try {
                         val = Integer.valueOf(ops[pos++]);
                     } catch (NumberFormatException e) {
-                        throw new ParseException
-                                ("Not a Number: \"" + ops[pos - 1] + "\"", pos - 1);
+                        throw new ParseException("Not a Number: \"" + ops[pos - 1] + "\"", pos - 1);
                     }
                     if ('-' == command) {
                         val = 0 - val;
@@ -316,19 +308,16 @@ public class DateMathParser {
                         String unit = ops[pos++];
                         add(cal, val, unit);
                     } catch (IllegalArgumentException e) {
-                        throw new ParseException
-                                ("Unit not recognized: \"" + ops[pos - 1] + "\"", pos - 1);
+                        throw new ParseException("Unit not recognized: \"" + ops[pos - 1] + "\"", pos - 1);
                     }
                     break;
                 default:
-                    throw new ParseException
-                            ("Unrecognized command: \"" + command + "\"", pos - 1);
+                    throw new ParseException("Unrecognized command: \"" + command + "\"", pos - 1);
             }
         }
 
         return cal.getTime();
     }
 
-    private static Pattern splitter = Pattern.compile("\\b|(?<=\\d)(?=\\D)");
 
 }
