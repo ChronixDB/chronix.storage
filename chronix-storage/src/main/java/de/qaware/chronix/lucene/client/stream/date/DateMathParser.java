@@ -247,7 +247,7 @@ public final class DateMathParser {
     /**
      * @return the current date
      */
-    public Date getNow() {
+    private Date getNow() {
         if (now == null) {
             // fall back to current time if no request info set
             now = new Date();
