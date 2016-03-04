@@ -192,7 +192,7 @@ sonarqube {
         property "sonar.jdbc.password", "$jdbcPw"
         property "sonar.projectName", "ChronixDB-Storage"
         property "sonar.projectKey", "de.qaware.chronix:chronix.storage"
-        property "sonar.projectVersoin", "$project.version"
+        property "sonar.projectVersion", "$project.version"
 
     }
 }
