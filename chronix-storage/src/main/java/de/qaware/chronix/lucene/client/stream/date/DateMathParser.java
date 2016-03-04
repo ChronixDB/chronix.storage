@@ -261,6 +261,7 @@ public final class DateMathParser {
      * @return the resulting date
      * @throws ParseException positions in ParseExceptions are token positions, not character positions.
      */
+    @SuppressWarnings("all") // The class is copied from solr codebase
     public Date parseMath(String math) throws ParseException {
 
         Calendar cal = Calendar.getInstance(zone, loc);
