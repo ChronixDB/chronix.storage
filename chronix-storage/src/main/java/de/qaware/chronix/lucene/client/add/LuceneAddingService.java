@@ -112,7 +112,7 @@ public final class LuceneAddingService {
         Object modifiedFieldValue = fieldValue;
 
         //If have an array, simple convert it into an list.
-        if (modifiedFieldValue != null && modifiedFieldValue.getClass().isArray()) {
+        if (fieldValue != null && fieldValue.getClass().isArray()) {
             modifiedFieldValue = Arrays.asList((Object[]) fieldValue);
         }
         //Handle all iterable data types
@@ -120,11 +120,11 @@ public final class LuceneAddingService {
             Iterable objects = (Iterable) modifiedFieldValue;
 
             int fieldCounter = 0;
-            fieldName = fieldName + ChronixLuceneStorageConstants.MULTI_VALUE_FIELD_DELIMITER;
+            String modifiedFieldName = fieldName + ChronixLuceneStorageConstants.MULTI_VALUE_FIELD_DELIMITER;
             for (Object o : objects) {
                 fieldCounter++;
-                handleNumbers(document, fieldName + fieldCounter, o);
-                handleStringsAndBytes(document, fieldName + fieldCounter, o);
+                handleNumbers(document, modifiedFieldName + fieldCounter, o);
+                handleStringsAndBytes(document, modifiedFieldName + fieldCounter, o);
             }
         }
     }
