@@ -59,6 +59,7 @@ public final class LuceneIndex {
      * Closes the writer and opens a searcher.
      *
      * @return the lucene index searcher
+     * @throws IOException if the underlying lucene reader can not be opened or created
      */
     public IndexSearcher getSearcher() throws IOException {
         if (searcher == null && readerClosed()) {
@@ -75,6 +76,7 @@ public final class LuceneIndex {
      * If the reader is open this method will close the reader.
      *
      * @return an open lucene writer
+     * @throws IOException if the lucene writer can not be opened or created
      */
     public IndexWriter getOpenWriter() throws IOException {
         if (writerClosed()) {
@@ -94,6 +96,7 @@ public final class LuceneIndex {
      * Then opens the index reader.
      *
      * @return an open lucene reader.
+     * @throws IOException if the lucene reader can not be opened or created
      */
     public IndexReader getOpenReader() throws IOException {
         if (writerOpen()) {
