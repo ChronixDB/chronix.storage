@@ -258,6 +258,7 @@ public final class DateMathParser {
     /**
      * Parses a string of commands relative "now" are returns the resulting Date.
      *
+     * @return the resulting date
      * @throws ParseException positions in ParseExceptions are token positions, not character positions.
      */
     public Date parseMath(String math) throws ParseException {
