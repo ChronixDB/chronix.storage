@@ -18,7 +18,10 @@ package de.qaware.chronix.lucene.client.add;
 import de.qaware.chronix.converter.BinaryTimeSeries;
 import de.qaware.chronix.converter.TimeSeriesConverter;
 import de.qaware.chronix.lucene.client.ChronixLuceneStorageConstants;
-import org.apache.lucene.document.*;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StoredField;
+import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.util.BytesRef;
 import org.slf4j.Logger;
@@ -161,14 +164,17 @@ public final class LuceneAddingService {
      */
     private static void handleNumbers(Document document, String fieldName, Object fieldValue) {
         if (fieldValue instanceof Double) {
-            document.add(new DoubleField(fieldName, Double.parseDouble(fieldValue.toString()), Field.Store.YES));
+            document.add(new StoredField(fieldName, Double.parseDouble(fieldValue.toString())));
         } else if (fieldValue instanceof Integer) {
-            document.add(new IntField(fieldName, Integer.parseInt(fieldValue.toString()), Field.Store.YES));
+            document.add(new StoredField(fieldName, Integer.parseInt(fieldValue.toString())));
         } else if (fieldValue instanceof Float) {
-            document.add(new FloatField(fieldName, Float.parseFloat(fieldValue.toString()), Field.Store.YES));
+            document.add(new StoredField(fieldName, Float.parseFloat(fieldValue.toString())));
         } else if (fieldValue instanceof Long) {
-            document.add(new LongField(fieldName, Long.parseLong(fieldValue.toString()), Field.Store.YES));
+            document.add(new StoredField(fieldName, Long.parseLong(fieldValue.toString())));
+        } else {
+            LOGGER.warn("Cloud not extract value from field {} with value {}", fieldName, fieldValue);
         }
+
     }
 
 }

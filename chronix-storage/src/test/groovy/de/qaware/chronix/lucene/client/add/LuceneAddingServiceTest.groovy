@@ -19,9 +19,7 @@ import de.qaware.chronix.lucene.client.LuceneIndex
 import de.qaware.chronix.lucene.client.SimpleTimeSeries
 import de.qaware.chronix.lucene.client.SimpleTimeSeriesConverter
 import org.apache.lucene.analysis.standard.StandardAnalyzer
-import org.apache.lucene.document.Field
 import org.apache.lucene.document.StoredField
-import org.apache.lucene.document.TextField
 import org.apache.lucene.index.IndexableField
 import org.apache.lucene.store.RAMDirectory
 import spock.lang.Shared
@@ -47,19 +45,22 @@ class LuceneAddingServiceTest extends Specification {
         expectedFields.add(new StoredField("float", 3.2f))
         expectedFields.add(new StoredField("int", 10))
         expectedFields.add(new StoredField("long", 12l))
-        expectedFields.add(new Field("string", "hello", TextField.TYPE_STORED))
+
+        expectedFields.add(new StoredField("string", "hello"))
 
         //byte field
         expectedFields.add(new StoredField("bytes", "chronix rocks".bytes))
 
         //String array
-        expectedFields.add(new Field("string_array::mv::1", "one", TextField.TYPE_STORED))
-        expectedFields.add(new Field("string_array::mv::2", "two", TextField.TYPE_STORED))
-        expectedFields.add(new Field("string_array::mv::3", "three", TextField.TYPE_STORED))
+        expectedFields.add(new StoredField("string_array::mv::1", "one"))
+        expectedFields.add(new StoredField("string_array::mv::2", "two"))
+        expectedFields.add(new StoredField("string_array::mv::3", "three"))
 
         //mixed
-        expectedFields.add(new Field("mixed::mv::1", "hello", TextField.TYPE_STORED))
-        expectedFields.add(new Field("mixed::mv::3", "chronix", TextField.TYPE_STORED))
+        expectedFields.add(new StoredField("mixed::mv::1", "hello"))
+        expectedFields.add(new StoredField("mixed::mv::2", 1.2d))
+        expectedFields.add(new StoredField("mixed::mv::3", "chronix"))
+
     }
 
     def "test add"() {
@@ -75,7 +76,7 @@ class LuceneAddingServiceTest extends Specification {
         then:
         result
         def fields = doc.fields
-        fields.size() == 14
+        fields.size() == 15
 
 
         checkIfEquals(fields, expectedFields)
@@ -137,7 +138,7 @@ class LuceneAddingServiceTest extends Specification {
             sts.add("string", "hello")
 
             sts.add("double", 5.0d)
-            sts.add("int", 10)
+            sts.add("int", 10i)
             sts.add("float", 3.2f)
             sts.add("long", 12l)
 
@@ -146,9 +147,10 @@ class LuceneAddingServiceTest extends Specification {
             sts.add("double_array", [5.0d, 3.2d, 4.2d] as Double[])
             sts.add("string_array", ["one", "two", "three"] as String[])
 
-            sts.add("mixed", ["hello", 1.2, "chronix"] as ArrayList)
+            sts.add("mixed", ["hello", 1.2d, "chronix"] as ArrayList)
             //Not a pojo
             sts.add("ignored", new SimpleTimeSeries())
+
 
             result.add(sts)
         }

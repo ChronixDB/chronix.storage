@@ -17,11 +17,11 @@ package de.qaware.chronix.solr
 
 import de.qaware.chronix.ChronixClient
 import de.qaware.chronix.converter.KassiopeiaSimpleConverter
+import de.qaware.chronix.converter.common.DoubleList
+import de.qaware.chronix.converter.common.LongList
 import de.qaware.chronix.lucene.client.ChronixLuceneStorage
 import de.qaware.chronix.lucene.client.LuceneIndex
 import de.qaware.chronix.timeseries.MetricTimeSeries
-import de.qaware.chronix.timeseries.dt.DoubleList
-import de.qaware.chronix.timeseries.dt.LongList
 import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.queryparser.classic.QueryParser
 import org.apache.lucene.search.Query
