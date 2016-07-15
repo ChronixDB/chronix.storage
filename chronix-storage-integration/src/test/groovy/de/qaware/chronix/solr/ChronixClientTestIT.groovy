@@ -83,11 +83,9 @@ class ChronixClientTestIT extends Specification {
     BinaryOperator<MetricTimeSeries> reduce = new BinaryOperator<MetricTimeSeries>() {
         @Override
         MetricTimeSeries apply(MetricTimeSeries t1, MetricTimeSeries t2) {
-            MetricTimeSeries.Builder reduced = new MetricTimeSeries.Builder(t1.getMetric())
-                    .points(concat(t1.getTimestamps(), t2.getTimestamps()),
-                    concat(t1.getValues(), t2.getValues()))
-                    .attributes(t1.attributes());
-            return reduced.build();
+            t1.addAll(t2.getTimestampsAsArray(), t2.getValuesAsArray())
+            t1.getAttributesReference().putAll(t2.getAttributesReference())
+            return t1;
         }
     }
 
