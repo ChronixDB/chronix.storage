@@ -17,7 +17,8 @@ def luceneIndex = new LuceneIndex(FSDirectory.open(Paths.get("build/lucene")), n
 //Define a time series of type metric
 def ts = new MetricTimeSeries.Builder("github stars","metric")
          .attribute("host", "groovy")
-         .attribute("source", "readme.md") 
+         .attribute("source", "readme.md")
+         .build()
 
 //Add values
 ts.add(Instant.now().toEpochMilli(), 4711)
