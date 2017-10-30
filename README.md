@@ -26,6 +26,10 @@ ts.add(Instant.now().toEpochMilli(), 4711)
 //Add the time series to the the index
 chronix.add([ts] as List, luceneIndex)
 
+
+//we do a hart commit - only for testing purposes
+luceneIndex.getOpenWriter().commit()
+
 //Stream time series that match the lucene query *:*
 def timeSeriesStream = chronix.stream(luceneIndex, createQuery("*:*"))
 
