@@ -17,8 +17,6 @@ package de.qaware.chronix.solr
 
 import de.qaware.chronix.ChronixClient
 import de.qaware.chronix.converter.MetricTimeSeriesConverter
-import de.qaware.chronix.converter.common.DoubleList
-import de.qaware.chronix.converter.common.LongList
 import de.qaware.chronix.lucene.client.ChronixLuceneStorage
 import de.qaware.chronix.lucene.client.LuceneIndex
 import de.qaware.chronix.timeseries.MetricTimeSeries
@@ -89,16 +87,6 @@ class ChronixClientTestIT extends Specification {
         }
     }
 
-    DoubleList concat(DoubleList first, DoubleList second) {
-        first.addAll(second)
-        first
-    }
-
-    LongList concat(LongList first, LongList second) {
-        first.addAll(second)
-        first
-    }
-
     def setupSpec() {
         given:
         LOGGER.info("Setting up the integration test.")
@@ -114,7 +102,7 @@ class ChronixClientTestIT extends Specification {
         luceneIndex.getOpenWriter().commit()
 
         LOGGER.info("Adding data to Chronix.")
-        importTimeSeriesData();
+        importTimeSeriesData()
         //we do a hart commit - only for testing purposes
         luceneIndex.getOpenWriter().commit()
 
@@ -201,7 +189,7 @@ class ChronixClientTestIT extends Specification {
 
 
     Query createQuery(String searchString) {
-        QueryParser queryParser = new QueryParser("metric", luceneIndex.getOpenWriter().getAnalyzer())
+        QueryParser queryParser = new QueryParser("name", luceneIndex.getOpenWriter().getAnalyzer())
         return queryParser.parse(searchString)
     }
 

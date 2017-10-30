@@ -5,7 +5,35 @@
 
 # Chronix Storage
 The Chronix Storage is an implementation of the Chronix API that uses Apache Lucene.
-Hence the Chronix Storage can be used with Chronix Kassiopeia to store and query time series.
+Hence the Chronix Storage can be used with Chronix-Timeseries to store and query time series.
+
+## Usage
+The following code snipped shows how to create a chronix client that writes to a given lucene index.
+```groovy
+def chronix = new ChronixClient(new MetricTimeSeriesConverter<>(), new ChronixLuceneStorage(200, ChronixTimeSeriesDefaults.GROUP_BY, ChronixTimeSeriesDefaults.REDUCE))
+def luceneIndex = new LuceneIndex(FSDirectory.open(Paths.get("build/lucene")), new StandardAnalyzer())
+
+
+//Define a time series of type metric
+def ts = new MetricTimeSeries.Builder("github stars","metric")
+         .attribute("host", "groovy")
+         .attribute("source", "readme.md") 
+
+//Add values
+ts.add(Instant.now().toEpochMilli(), 4711)
+
+//Add the time series to the the index
+chronix.add([ts] as List, luceneIndex)
+
+//Stream time series that match the lucene query *:*
+def timeSeriesStream = chronix.stream(luceneIndex, createQuery("*:*"))
+
+//Create a proper lucene query
+Query createQuery(String searchString) {
+  QueryParser queryParser = new QueryParser("name", luceneIndex.getOpenWriter().getAnalyzer())
+  return queryParser.parse(searchString)
+}
+```
 
 ## Contributing
 Is there anything missing? Do you have ideas for new features or improvements? You are highly welcome to contribute
