@@ -149,7 +149,7 @@ public class LuceneStreamingService<T> implements Iterator<T> {
     private void convertHits(ScoreDoc[] hits) throws IOException {
         for (ScoreDoc hit : hits) {
             Document hitDoc = searcher.doc(hit.doc);
-            ListenableFuture future = service.submit(new TimeSeriesConverterCaller<>(hitDoc, converter, queryStart, queryEnd));
+            ListenableFuture<T> future = service.submit(new TimeSeriesConverterCaller<>(hitDoc, converter, queryStart, queryEnd));
             Futures.addCallback(future, timeSeriesHandler);
         }
     }

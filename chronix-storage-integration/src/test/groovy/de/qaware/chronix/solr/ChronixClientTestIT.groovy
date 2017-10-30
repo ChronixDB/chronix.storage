@@ -16,7 +16,7 @@
 package de.qaware.chronix.solr
 
 import de.qaware.chronix.ChronixClient
-import de.qaware.chronix.converter.KassiopeiaSimpleConverter
+import de.qaware.chronix.converter.MetricTimeSeriesConverter
 import de.qaware.chronix.converter.common.DoubleList
 import de.qaware.chronix.converter.common.LongList
 import de.qaware.chronix.lucene.client.ChronixLuceneStorage
@@ -73,9 +73,9 @@ class ChronixClientTestIT extends Specification {
             metricKey.append(ts.attribute("host")).append("-")
                     .append(ts.attribute("source")).append("-")
                     .append(ts.attribute("group")).append("-")
-                    .append(ts.getMetric());
+                    .append(ts.name)
 
-            return metricKey.toString();
+            return metricKey.toString()
         }
     }
 
@@ -85,16 +85,16 @@ class ChronixClientTestIT extends Specification {
         MetricTimeSeries apply(MetricTimeSeries t1, MetricTimeSeries t2) {
             t1.addAll(t2.getTimestampsAsArray(), t2.getValuesAsArray())
             t1.getAttributesReference().putAll(t2.getAttributesReference())
-            return t1;
+            return t1
         }
     }
 
-    def DoubleList concat(DoubleList first, DoubleList second) {
+    DoubleList concat(DoubleList first, DoubleList second) {
         first.addAll(second)
         first
     }
 
-    def LongList concat(LongList first, LongList second) {
+    LongList concat(LongList first, LongList second) {
         first.addAll(second)
         first
     }
@@ -102,10 +102,10 @@ class ChronixClientTestIT extends Specification {
     def setupSpec() {
         given:
         LOGGER.info("Setting up the integration test.")
-        chronix = new ChronixClient(new KassiopeiaSimpleConverter<>(), new ChronixLuceneStorage(200, groupBy, reduce))
-        Path path = Paths.get("build/lucene");
-        def directory = FSDirectory.open(path);
-        def analyzer = new StandardAnalyzer();
+        chronix = new ChronixClient(new MetricTimeSeriesConverter<>(), new ChronixLuceneStorage(200, groupBy, reduce))
+        Path path = Paths.get("build/lucene")
+        def directory = FSDirectory.open(path)
+        def analyzer = new StandardAnalyzer()
         luceneIndex = new LuceneIndex(directory, analyzer)
 
 
@@ -125,7 +125,7 @@ class ChronixClientTestIT extends Specification {
     }
 
     def importTimeSeriesData() {
-        def url = ChronixClientTestIT.getResource("/timeSeries");
+        def url = ChronixClientTestIT.getResource("/timeSeries")
         def tsDir = new File(url.toURI())
 
         tsDir.listFiles().each { File file ->
@@ -134,7 +134,7 @@ class ChronixClientTestIT extends Specification {
 
             def attributes = file.name.split("_")
             def onlyOnce = true
-            def nf = DecimalFormat.getInstance(Locale.ENGLISH);
+            def nf = DecimalFormat.getInstance(Locale.ENGLISH)
 
             def filePoints = 0
 
@@ -143,7 +143,7 @@ class ChronixClientTestIT extends Specification {
                 if ("Date" == fields[0]) {
                     if (onlyOnce) {
                         fields.subList(1, fields.size()).eachWithIndex { String field, int i ->
-                            def ts = new MetricTimeSeries.Builder(field)
+                            def ts = new MetricTimeSeries.Builder(field,"metric")
                                     .attribute("host", attributes[0])
                                     .attribute("source", attributes[1])
                                     .attribute("group", attributes[2])
@@ -182,7 +182,7 @@ class ChronixClientTestIT extends Specification {
     def "Test add and query time series to Chronix with Solr"() {
         when:
         //query all documents
-        List<MetricTimeSeries> timeSeries = chronix.stream(luceneIndex, createQuery("*:*")).collect(Collectors.toList());
+        List<MetricTimeSeries> timeSeries = chronix.stream(luceneIndex, createQuery("*:*")).collect(Collectors.toList())
 
         then:
         timeSeries.size() == 26i
@@ -201,8 +201,8 @@ class ChronixClientTestIT extends Specification {
 
 
     Query createQuery(String searchString) {
-        QueryParser queryParser = new QueryParser("metric", luceneIndex.getOpenWriter().getAnalyzer());
-        return queryParser.parse(searchString);
+        QueryParser queryParser = new QueryParser("metric", luceneIndex.getOpenWriter().getAnalyzer())
+        return queryParser.parse(searchString)
     }
 
 }

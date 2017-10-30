@@ -1,12 +1,11 @@
 dependencies {
-    testCompile 'de.qaware.chronix:chronix-api:0.1'
-    testCompile 'de.qaware.chronix:chronix-kassiopeia-simple:0.2'
-    testCompile 'de.qaware.chronix:chronix-kassiopeia-simple-converter:0.2'
-    testCompile 'de.qaware.chronix:chronix-kassiopeia-common:0.2'
+    testCompile 'de.qaware.chronix:chronix-api:0.2-beta'
+    testCompile 'de.qaware.chronix:chronix-timeseries:0.3.2-beta'
+    testCompile 'de.qaware.chronix:chronix-timeseries-converter:0.3.2-beta'
 
-    testCompile 'org.apache.lucene:lucene-core:6.1.0'
-    testCompile 'org.apache.lucene:lucene-analyzers-common:6.1.0'
-    testCompile 'org.apache.lucene:lucene-queryparser:6.1.0'
+    testCompile 'org.apache.lucene:lucene-core:7.1.0'
+    testCompile 'org.apache.lucene:lucene-analyzers-common:7.1.0'
+    testCompile 'org.apache.lucene:lucene-queryparser:7.1.0'
 
     testCompile project(':chronix-storage')
 }

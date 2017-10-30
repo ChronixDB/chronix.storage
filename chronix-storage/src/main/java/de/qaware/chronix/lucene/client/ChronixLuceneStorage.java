@@ -25,10 +25,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -74,8 +76,8 @@ public final class ChronixLuceneStorage<T> implements StorageService<T, LuceneIn
             LuceneStreamingService<T> luceneStreamingService = new LuceneStreamingService<>(converter, query, index.getSearcher(), nrOfDocumentPerBatch);
 
             return StreamSupport.stream(Spliterators.spliteratorUnknownSize(luceneStreamingService, Spliterator.SIZED), false)
-                    .filter(t -> t != null)//Remove empty results
-                    .collect(groupingBy((Function<T, String>) groupBy::apply)).values().stream()
+                    .filter(Objects::nonNull)//Remove empty results
+                    .collect(groupingBy(groupBy)).values().stream()
                     .map(ts -> ts.stream().reduce(reduce).get());
 
         } catch (IOException e) {

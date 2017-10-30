@@ -34,7 +34,7 @@ import java.util.function.Function
 class ChronixLuceneStorageTest extends Specification {
 
     @Shared
-    def analyzer = new StandardAnalyzer();
+    def analyzer = new StandardAnalyzer()
 
     @Shared
     def group = new Function() {
@@ -54,8 +54,8 @@ class ChronixLuceneStorageTest extends Specification {
 
     def "test add and stream document"() {
         given:
-        Path path = Paths.get("build/lucene");
-        def directory = FSDirectory.open(path);
+        Path path = Paths.get("build/lucene")
+        def directory = FSDirectory.open(path)
         def luceneIndex = new LuceneIndex(directory, analyzer)
         def luceneStorage = new ChronixLuceneStorage<>(200, group, reduce)
         def query = createQuery("text")
@@ -63,7 +63,7 @@ class ChronixLuceneStorageTest extends Specification {
         luceneIndex.getOpenWriter().deleteAll()
 
         when:
-        def documents = createDocument(1)
+        def documents = createDocument()
         luceneStorage.add(new SimpleTimeSeriesConverter(), documents, luceneIndex)
 
         def stream = luceneStorage.stream(new SimpleTimeSeriesConverter(), luceneIndex, query)
@@ -75,27 +75,18 @@ class ChronixLuceneStorageTest extends Specification {
         stream.count() == 1
     }
 
-    Collection<SimpleTimeSeries> createDocument(int i) {
-        def text = "This is the text to be indexed.";
+    Collection<SimpleTimeSeries> createDocument() {
+        def text = "This is the text to be indexed."
 
         def document = new SimpleTimeSeries()
-        document.add("fieldname", text);
+        document.add("fieldname", text)
 
         [document]
     }
 
 
     Query createQuery(String searchString) {
-        QueryParser queryParser = new QueryParser("fieldname", analyzer);
-        return queryParser.parse(searchString);
+        QueryParser queryParser = new QueryParser("fieldname", analyzer)
+        return queryParser.parse(searchString)
     }
-/*
-    def "test add"() {
-        given:
-
-        when:
-        // TODO implement stimulus
-        then:
-        // TODO implement assertions
-    }*/
 }
