@@ -50,7 +50,7 @@ class ChronixClientTestIT extends Specification {
     ChronixClient<MetricTimeSeries, LuceneIndex, Query> chronix
 
     @Shared
-    LuceneIndex luceneIndex;
+    LuceneIndex luceneIndex
 
     @Shared
     def listStringField = ["List first part", "List second part"]
